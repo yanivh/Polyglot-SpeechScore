@@ -32,10 +32,76 @@ By incorporating both phonetic and graphemic representations, we aim to offer co
 
 ## **Solution walk-through**
 
-**Create** a virtual environment and install the required packages:
-`python3 -m venv .venv
-source .venv/bin/activate` 
+Create a virtual environment and install the required packages:
+```bash
+python3 -m venv .venv`
+`source .venv/bin/activate` 
+```
+
+
+### __**Phonetic**__
+
+####     **Phonetic representation**
+
+        Per each sentence 
+            Words tokenize , using nltk library. 
+            Normalize  
+                Removing extra symbols,  
+                Remove not alphabetic characters.
+                Convert to lowercase.
+                Remove duplicates.
+            Return list of words.
+        Per each word
+        segment the word into graphemes
+		    Use grapheme_list to group char’s, ex.['ee','ll']
+		    Return list of graphemes.
+
+####     **Graphemic comparison**
+
+	    Per each graphemes
+        Convert the words to lowercase for case-insensitive comparison
+	    Check if the words are identical
+		Iterate over each character in the words and count differences
+        crate similarity score based on the number of differences.
+
+### __**Graphemic**__
+
+####     **Graphemic representation**
+
+        Per each sentence 
+            Words tokenize , using nltk library. 
+            normalize - 
+                Removing extra symbols,  
+                Remove not alphabetic characters.
+                Convert to lowercase.
+                Remove duplicates.
+            Return list of words.
+        Per each word
+        segment the word into graphemes
+		    Use grapheme_list to group char’s, ex.['ee','ll']
+		    Return list of graphemes.
+
+####     **Graphemic comparison**
+
+	    Per each graphemes
+        Convert the words to lowercase for case-insensitive comparison
+	    Check if the words are identical
+		Iterate over each character in the words and count differences
+        crate similarity score based on the number of differences.
 
 
 
-## **questions**
+
+
+#### Questions
+
+#### Question 1
+What limitations of using a speech-to-text engine for pronunciation training purposes have you observed?
+
+#### Your answer
+
+Write your answer here.
+
+#### Question 2
+
+You had very limited resources for this  implementation. Briefly describe what kind of approach you might have chosen if time and resources would not have been a problem.

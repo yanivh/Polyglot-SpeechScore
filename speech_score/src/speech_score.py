@@ -1,16 +1,10 @@
-
 import difflib
 import numpy as np
 from gruut import sentences
 import nltk
 from nltk.corpus import cmudict
-import panphon
-import ipapy as ipa
-
-import epitran
-import stanza
-import speech_score.src.utils as speech_score_utils
-
+from utils import read_json_file
+from itertools import zip_longest
 
 def evaluate_pronunciation(text_to_record, sr_transcript_of_learner_recording):
     # Clean up the transcripts and remove punctuation
@@ -101,8 +95,7 @@ def wer(string_a, string_b):
     return dp[len_b][len_a]
 
 
-def grapheme_to_phoneme_gruut( grapheme, lang="en"):
-
+def grapheme_to_phoneme_gruut(grapheme, lang="en"):
     for sent in sentences(grapheme, lang=lang, espeak=True):
         for word in sent:
             if word.phonemes:
@@ -145,17 +138,25 @@ def text_into_phonetic_representations_epitran(word):
 
 
 def word_segmentation(sentence, language='en'):
+    '''
+        Description:
+        Convert to lowercase
+        tokaniz e the sentence
+        Removing extra symbols,
+        todo: Remove not alphabetic characters.
+        todo : Remove duplicates.
+        :param
+            sentence:
+            language: default 'en'
+        :return:
+        '''
+
     punctuation_marks = '.,?!;:()[]{}"\'-'
 
-
-    stanza.download('en')  # This downloads the English models for the neural pipeline
-    nlp = stanza.Pipeline(language)  # This sets up a default neural pipeline in English
-    doc = nlp(sentence)
-    doc.sentences[0].print_dependencies()
-
+    sentence = sentence.lower()
 
     # Identify the language of the sentence
-    words = nltk.word_tokenize(sentence)
+    words = nltk.word_tokenize(sentence, language=language)
 
     #  remove punctuation_marks
     words = [word for word in words if word not in punctuation_marks]
@@ -183,45 +184,92 @@ def break_word_to_graphemes(word, grapheme_list=['ee', 'll', 'ay', 'eu', 'ou', '
     return graphemes
 
 
-def graphemic_comparison(list1, list2):
-    for i in range(len(list1)):
-        word1 = str(list1[i])
-        if list2[i]:
-            word2 = str(list2[i])
+def calculate(text_to_record_phonemes, text_learner_recording_phonemes):
+    '''
+
+    :param text_to_record_phonemes:
+    :param text_learner_recording_phonemes:
+    :return:
+    '''
+
+    output = []
+
+    try :
+        # for i in range(len(text_to_record_phonemes)):
+        for i, (elem1, elem2) in enumerate(zip_longest(text_to_record_phonemes, text_learner_recording_phonemes, fillvalue=None)):
+
+            if elem2 != None and elem1 != None:
+                text_to_record_phonemes_ = elem1
+                text_learner_recording_phonemes_ = elem2
+            elif elem1 == None:
+                text_to_record_phonemes_ = {'word': [], 'phonemes': [] }
+            elif elem2 == None:
+                text_learner_recording_phonemes_ = {'word': [], 'phonemes': []}
+
+            difference, matches = phoneme_comparison(text_to_record_phonemes_['phonemes'], text_learner_recording_phonemes_['phonemes'])
+            if len(matches) == 0 and len(difference) == 0:
+                output.append({'word': '', 'match_score': 0})
+            elif difference :
+                output.append({'word': text_to_record_phonemes_['word'], 'match_score': f'-{len(difference)}'})
+            else:
+                output.append({'word': text_to_record_phonemes_['word'], 'match_score': len(matches)/len(text_to_record_phonemes_['phonemes'])})
+    except Exception as e:
+        print(f"Error: {e}")
+
+    return output
+
+def phoneme_comparison(text_to_record_phonetic, text_learner_recording_phonetic):
+    output = []
+
+    difference = list(set(text_to_record_phonetic).difference(text_learner_recording_phonetic))
+    matches = list(set(text_to_record_phonetic).intersection(text_learner_recording_phonetic))
+
+    return difference, matches
+
+
+def graphemic_comparison(text_to_record_phonetic, text_learner_recording_phonetic):
+    output = []
+    for i in range(len(text_to_record_phonetic)):
+        text_to_record_word = str(text_to_record_phonetic[i])
+        if text_learner_recording_phonetic[i]:
+            text_learner_recording_word = str(text_learner_recording_phonetic[i])
         else:
-            word2 = ""
+            text_learner_recording_word = ""
 
-        # Convert the words to lowercase for case-insensitive comparison
-        word1 = word1.lower()
-        word2 = word2.lower()
+        difference = list(set(text_to_record_phonetic[i]).difference(text_learner_recording_phonetic[i]))
+        matches = list(set(text_to_record_phonetic[i]).intersection(text_learner_recording_phonetic[i]))
 
-        # Check if the words are identical
-        if word1 == word2:
-            print(f" {word1} : {word2} , words are identical")
-            continue
-
-        # Check if the words have the same length
-        if len(word1) != len(word2):
-            print(f" {word1} : {word2} , have different lengths.")
-            # continue
-            # return "The words have different lengths."
-
-        # Initialize a counter for the number of differing characters
-        differing_characters = 0
-
-        # Iterate over each character in the words and count differences
-        for char1, char2 in zip(word1, word2):
-            if char1 != char2:
-                differing_characters += 1
-
-        # Generate a message based on the number of differing characters
-        if differing_characters == 0:
-            print(f" {word1} : {word2} ,The words have the same letters in different order.")
-        elif differing_characters == 1:
-            print(f" {word1} : {word2} ,The words differ by only one letter.")
-        else:
-            print(f" {word1} : {word2} ,The words differ by more than one letter.")
-
+        return difference, matches
+        #
+        # # Check if the words are identical
+        # if text_to_record_word == text_learner_recording_word:
+        #     print(f" {text_to_record_word} : {text_learner_recording_word} , words are identical")
+        #     # xx= 'text_to_record_word': f"{text_to_record_word}, 'text_learner_recording_word': f'{text_learner_recording_word}'
+        #     # output.append()
+        #     continue
+        #
+        # # Check if the words have the same length
+        # if len(word1) != len(word2):
+        #     print(f" {word1} : {word2} , have different lengths.")
+        #     # continue
+        #     # return "The words have different lengths."
+        #
+        # # Initialize a counter for the number of differing characters
+        # differing_characters = 0
+        #
+        # # Iterate over each character in the words and count differences
+        # for char1, char2 in zip(word1, word2):
+        #     if char1 != char2:
+        #         differing_characters += 1
+        #
+        # # Generate a message based on the number of differing characters
+        # if differing_characters == 0:
+        #     print(f" {word1} : {word2} ,The words have the same letters in different order.")
+        # elif differing_characters == 1:
+        #     print(f" {word1} : {word2} ,The words differ by only one letter.")
+        # else:
+        #     print(f" {word1} : {word2} ,The words differ by more than one letter.")
+        #
 
 def get_feature_table():
     feature_table = {}
@@ -260,124 +308,49 @@ def extract_panphon_feature(phone, phoible_segments_features_table, language='en
 
 if __name__ == "__main__":
 
-    learner_input = speech_score_utils.read_json_file("speech_score/data/metadata/learner_input.json")
+    nltk.download('punkt')
+    learner_input = read_json_file("speech_score/data/metadata/learner_input.json")
+    # phoible_segments_features_table = get_feature_table()
+
+    result =[]
+    text_to_record = ""
+    text_learner_recording = ""
 
     #  phonetic comparison section - start
+    for input in learner_input :
+        text_to_record = input['text_to_record']
+        text_learner_recording = input['sr_transcript_of_learner_recording']
 
-    text_to_record = "I like to watch Youtube."
-    sr_transcript_of_learner_recording = "I like to watch You too"
+        #  Phonetic comparison section - Start
+        text_to_record_words = word_segmentation(sentence=text_to_record, language='english')
+        text_learner_recording_words = word_segmentation(sentence=text_learner_recording, language='english')
 
-    phoible_segments_features_table = get_feature_table()
+        text_to_record_phonemes = []
+        for word in text_to_record_words:
+            text_to_record_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme_gruut(word) })
 
-    text_to_record_words = word_segmentation(sentence=text_to_record, language='en')
-    sr_transcript_of_learner_recording_words = word_segmentation(sentence=sr_transcript_of_learner_recording,
-                                                                    language='en')
+        text_learner_recording_phonemes = []
+        for word in text_learner_recording_words:
+            text_learner_recording_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme_gruut(word) })
 
-    text_to_record_phonetic = []
-    for word in text_to_record_words:
-        text_to_record_phonetic.append(grapheme_to_phoneme_gruut(word))
-
-
-    sr_transcript_of_learner_recording_phonetic = []
-    for word in sr_transcript_of_learner_recording_words:
-        sr_transcript_of_learner_recording_phonetic.append(grapheme_to_phoneme_gruut(word))
-
-
-    result = graphemic_comparison(text_to_record_phonetic, sr_transcript_of_learner_recording_phonetic)
-
-
-    # for phone in gruut_text_to_record:
-    #     print(phone)
-    #     gruut_text_to_record_feature = extract_panphon_feature(phone, phoible_segments_features_table)
-    #     print (gruut_text_to_record_feature)
-    #
-    # for phone in gruut_sr_transcript_of_learner_recording:
-    #     print(phone)
-    #     gruut_sr_transcript_of_learner_recording_feature = extract_panphon_feature(phone, phoible_segments_features_table)
-    #     print (gruut_sr_transcript_of_learner_recording_feature)
-    #
-    #     text_to_record_feature_lst = np.array(text_to_record_feature[0], dtype=np.float32)
-    # sr_transcript_of_learner_recording_feature_lst = np.array(sr_transcript_of_learner_recording_feature[0],
-    #                                                           dtype=np.float32)
-    #
-    # print(np.inner(text_to_record_feature_lst, sr_transcript_of_learner_recording_feature_lst))
-
-    print(1)
+        result.append( calculate(text_to_record_phonemes, text_learner_recording_phonemes))
+    print(result)
 
     #  phonetic comparison section - end
 
     #  graphemic comparison section - start
-    nltk.download('punkt')
-
-    text_to_record = "one"
-    sr_transcript_of_learner_recording = "won"
-
-    text_to_record_words = break_sentence_words(sentence=text_to_record, language='en')
-    sr_transcript_of_learner_recording_words = break_sentence_words(sentence=sr_transcript_of_learner_recording,
-                                                                    language='en')
-
-    text_to_record_graphemes = []
-    for word in text_to_record_words:
-        text_to_record_graphemes.append(break_word_to_graphemes(word))
-        print(text_to_record_graphemes)
-
-    sr_transcript_of_learner_recording_graphemes = []
-    for word in sr_transcript_of_learner_recording_words:
-        sr_transcript_of_learner_recording_graphemes.append(break_word_to_graphemes(word))
-        print(sr_transcript_of_learner_recording_graphemes)
-
-    result = graphemic_comparison(text_to_record_graphemes, sr_transcript_of_learner_recording_graphemes)
+    # text_to_record_words = word_segmentation(sentence=text_to_record, language='english')
+    # text_learner_recording_words = word_segmentation(sentence=text_learner_recording, language='english')
+    #
+    # text_to_record_graphemes = []
+    # for word in text_to_record_words:
+    #     text_to_record_graphemes.append(break_word_to_graphemes(word))
+    #
+    #
+    # text_learner_recording_graphemes = []
+    # for word in text_learner_recording_words:
+    #     text_learner_recording.append(break_word_to_graphemes(word))
+    #
+    # result = graphemic_comparison(text_to_record_graphemes, text_learner_recording_graphemes)
 
 #  graphemic comparison section - end
-
-
-#  not relevant section
-
-
-# similarity_ratio = dist = np.linalg.norm(np.array(text_to_record_graphemes)-np.array(sr_transcript_of_learner_recording_graphemes))
-# similarity_ratio    = evaluate_pronunciation(sr_transcript_of_learner_recording_graphemes, text_to_record_graphemes)
-
-# print(similarity_ratio)
-
-# text_to_record = "watch yo "
-# sr_transcript_of_learner_recording = "watch you"
-
-# ipapy
-# ipapy_word1_1 = text_into_phonetic_representations_epitran(text_to_record)
-# ipapy_word1_2 = text_into_phonetic_representations_epitran(sr_transcript_of_learner_recording)
-
-# gruut
-# gruut_word1 = text_into_phonetic_representations_gruut(text_to_record.split(' ')[0])
-# gruut_word2 = text_into_phonetic_representations_gruut(sr_transcript_of_learner_recording.split(' ')[0])
-
-# nltk
-# nltk_word1_1 = text_into_phonetic_representations_nltk(text_to_record.split(' ')[0])
-# nltk_word1_2 = text_into_phonetic_representations_nltk(sr_transcript_of_learner_recording.split(' ')[0])
-
-
-# feature_table= feature_table()
-
-
-# word1 = "euro"
-
-
-# a=feature_table[phonemes_word1[0][0]]
-
-# Print the phonemes for each word
-# print(f"Phonemes for '{word1}': {phonemes_word1}")
-
-
-# distance = fuzzy_match(text_to_record, sr_transcript_of_learner_recording)
-# print("Normalized Levenshtein distance between '{}' and '{}' is: {}".format(text_to_record, sr_transcript_of_learner_recording, distance))
-
-# a1 = wer(text_to_record, sr_transcript_of_learner_recording)
-
-
-# result_embedding = embedding_(text_to_record, sr_transcript_of_learner_recording)
-
-# print(f'similarity_ratio: {similarity_ratio}, result_embedding{result_embedding}')
-
-
-# price_str = "€2.5"
-# converted_price = convert_to_words(price_str)
-# print(converted_price)  # Output: "two and a half euros"
