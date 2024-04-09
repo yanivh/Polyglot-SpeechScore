@@ -13,11 +13,11 @@ In **learner_input.json**, you are given an example input from one speaking exer
 
 You don't have to use these recordings in your implementation but you should listen to them.
 
-sr_transcript_of_learner_recording: speech recognition transcript of what the learner said (we have already transribed the recordings for you to save time).
+**sr_transcript_of_learner_recording**: speech recognition transcript of what the learner said (we have already transribed the recordings for you to save time).
 
 Your task is to, using Python and any other resources of your liking, implement a basic system that would **evaluate** this input and **give** the learner some **feedback**:
 
-the goal of evaluation is to compare the expected result (text_to_record) with the learner input (sr_transcript_of_learner_recording) to assess whether the learner attempt was successful.
+the goal of evaluation is to compare the expected result (**text_to_record**) with the learner input (**sr_transcript_of_learner_recording**) to assess whether the learner attempt was successful.
 
 the goal of feedback is to **return** a **fair** and **helpful** message based on the results of the evaluation step. It is up to you to create this message. Some examples could be simply saying right or wrong, or returning phrases that should be repeated.
 
