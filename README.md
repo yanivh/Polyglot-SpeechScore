@@ -30,4 +30,12 @@ The overarching objective is to assess how closely the learner's recorded speech
 
 By incorporating both phonetic and graphemic representations, we aim to offer comprehensive feedback to learners. A high similarity score between the learner's input and the expected text will warrant positive feedback, while discrepancies may prompt suggestions for improvement. This approach ensures a thorough evaluation and helpful guidance for learners striving to improve their spoken language skills.
 
+## **Solution walk-through**
+
+**Create** a virtual environment and install the required packages:
+`python3 -m venv .venv
+source .venv/bin/activate` 
+
+
+
 ## **questions**
