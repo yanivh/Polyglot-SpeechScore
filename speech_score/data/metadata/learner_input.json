@@ -1,8 +1,8 @@
 [
-    {
-        "text_to_record": "I like to watch Youtube.",
-        "learner_recording": "youtube.wav",
-        "sr_transcript_of_learner_recording": "I like to watch you too."
+        {
+        "text_to_record": "I have two and a half euros.",
+        "learner_recording": "euros.wav",
+        "sr_transcript_of_learner_recording": "I have a, I have €8.5."
     },
     {
         "text_to_record": "interesting",
@@ -13,11 +13,6 @@
         "text_to_record": "won",
         "learner_recording": "won.wav",
         "sr_transcript_of_learner_recording": "One."
-    },
-    {
-        "text_to_record": "I have two and a half euros.",
-        "learner_recording": "euros.wav",
-        "sr_transcript_of_learner_recording": "I have a, I have €8.5."
     },
     {
         "text_to_record": "Today is the thirteenth of May, twenty twenty three.",
