@@ -1,5 +1,18 @@
 import json
 
+
+def get_threshold(config_file_path):
+    """
+    Get the threshold value from the configuration file.
+    :return: threshold value
+    """
+    # Load the configuration file
+    config = read_json_file(config_file_path)
+    # Get the threshold value from the configuration file
+    threshold = config[0]['threshold']
+    return threshold
+
+
 def read_json_file(file_path):
     """
     Reads and parses a JSON file.

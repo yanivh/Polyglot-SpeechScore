@@ -1,11 +1,11 @@
 from gruut import sentences
 import nltk
-from utils import read_json_file, write_json_file
+from utils import read_json_file, write_json_file , get_threshold
 from itertools import zip_longest
 import difflib
 
 
-def assess_similarity(expected_text, learner_transcript, threshold=0.9):
+def assess_similarity(expected_text, learner_transcript, threshold=0.7):
     """
     Assess the pronunciation of a learner based on the similarity ratio between the expected text and the learner's transcript.
     :param expected_text: The expected text to be pronounced by the learner.
@@ -66,25 +66,16 @@ def word_segmentation(sentence, language='en'):
     return words
 
 
-def phoneme_feeback(output):
+def phoneme_feedback(mismatch, matches):
     '''
     Provide feedback based on the phoneme comparison output
     :param output:
     :return:
     '''
 
-    feedback = ""
-    mismatch = 0
-    match = 0
-    for dictionary in output:
-        for key, value in dictionary.items():
-            if key == "match_score" and value != 1:
-                mismatch = mismatch + 1
-            else:
-                match = match + 1
 
     # Check if all values are equal to 1
-    if mismatch == 0:
+    if len(mismatch) == 0:
         feedback = f"Sounds good!"
     else:
         feedback = f"Needs improvement!"
@@ -92,34 +83,46 @@ def phoneme_feeback(output):
     return feedback
 
 
-def phoneme_difference(elem2, elem1):
+def phoneme_difference(elem1, elem2, threshold=0.7):
+    '''
+    Calculate the difference between two phonemes
+    :param elem1:
+    :param elem2:
+    :param threshold:
+    :return:
+    '''
 
-    output = []
-    if elem2 is not None and elem1 is not None:
-        expected_text_phonemes_ = elem1
-        learner_transcript__phonemes_ = elem2
-    elif elem1 is None:
-        expected_text_phonemes_ = {'word': [], 'phonemes': []}
-    elif elem2 is None and elem1 is not None:
-        expected_text_phonemes_ = elem1
-    elif elem2 is None:
-        learner_transcript__phonemes_ = {'word': [], 'phonemes': []}
+    try:
+        output = []
+        if elem2 is not None and elem1 is not None:
+            expected_text_phonemes_ = elem1
+            learner_transcript__phonemes_ = elem2
+        elif elem2 is None and elem1 is not None:
+            expected_text_phonemes_ = elem1
+            learner_transcript__phonemes_ = {'word': [], 'phonemes': []}
 
-    difference, matches = phoneme_comparison(expected_text_phonemes_['phonemes'],
-                                             learner_transcript__phonemes_['phonemes'])
 
-    if len(matches) == 0 and len(difference) == 0:
-        output.append({'word': '', 'match_score': 0})
-    elif difference:
-        output.append({'word': expected_text_phonemes_['word'], 'match_score': f'-{len(difference)}'})
-    else:
-        output.append({'word': expected_text_phonemes_['word'],
-                       'match_score': len(matches) / len(expected_text_phonemes_['phonemes'])})
+        difference, matches = phoneme_comparison(expected_text_phonemes_['phonemes'],
+                                                 learner_transcript__phonemes_['phonemes'])
+
+        feedback = phoneme_feedback(difference, matches)
+
+        if len(matches) == 0 and len(difference) == 0:
+            output.append({'word': '', 'match_score': 0, 'feedback': feedback})
+        elif difference:
+            output.append({'word': expected_text_phonemes_['word'], 'match_score': f'-{len(difference)}', 'feedback': feedback})
+
+        else:
+            output.append({'word': expected_text_phonemes_['word'],
+                           'match_score': len(matches) / len(expected_text_phonemes_['phonemes']), 'feedback': feedback})
+
+    except Exception as e:
+        print(f"Error: {e}")
 
     return output
 
 
-def calculate(expected_text_phonemes, learner_transcript_phonemes):
+def calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=0.7):
     '''
     Calculate the difference between the expected text phonemes and the learner transcript phonemes
     :param expected_text_phonemes:
@@ -128,19 +131,16 @@ def calculate(expected_text_phonemes, learner_transcript_phonemes):
     '''
 
     output = []
-    phoneme_sentence_feedback = []
 
     try:
         for i, (elem1, elem2) in enumerate(
                 zip_longest(expected_text_phonemes, learner_transcript_phonemes, fillvalue=None)):
-            output = phoneme_difference(elem2, elem1)
-
-            phoneme_sentence_feedback = phoneme_feeback(output)
+            output.append(phoneme_difference(elem1, elem2, threshold=threshold))
 
     except Exception as e:
         print(f"Error: {e}")
 
-    return output, phoneme_sentence_feedback
+    return output
 
 
 def phoneme_comparison(text_to_record_phonetic, text_learner_recording_phonetic):
@@ -157,7 +157,7 @@ def phoneme_comparison(text_to_record_phonetic, text_learner_recording_phonetic)
     return difference, matches
 
 
-def phonetic_comparison(expected_text_words, learner_transcript_words):
+def phonetic_comparison(expected_text_words, learner_transcript_words, threshold=0.7):
     '''
     phanetic comparison based on the phonetic transcription of the words
     :param expected_text_words:
@@ -179,15 +179,17 @@ def phonetic_comparison(expected_text_words, learner_transcript_words):
     for word in learner_transcript_words:
         learner_transcript_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme_gruut(word)})
 
-    comparison, feedback = calculate(expected_text_phonemes, learner_transcript_phonemes)
+    comparison = calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=threshold)
 
-    return comparison, feedback
+    return comparison
 
 
 if __name__ == "__main__":
 
     nltk.download('punkt')
     learner_inputs = read_json_file("speech_score/data/metadata/learner_input.json")
+
+    threshold = get_threshold("speech_score/data/config/config.json")
 
     result = []
 
@@ -205,16 +207,15 @@ if __name__ == "__main__":
         learner_transcript = learner_input['sr_transcript_of_learner_recording']
 
         #  Give some general feedback on the overall sentence
-        similarity_ratio, feedback = assess_similarity(expected_text, learner_transcript)
+        similarity_ratio, feedback = assess_similarity(expected_text, learner_transcript, threshold=threshold)
 
         #  Give feedback on each word in the sentence
-        phonetics_comparison, phonetic_feedback = phonetic_comparison(expected_text, learner_transcript)
+        phonetics_comparison = phonetic_comparison(expected_text, learner_transcript, threshold=threshold)
 
         # Add all analysis results to the result list
         sentence_result.append({'expected_text': expected_text, 'learner_transcript': learner_transcript})
         sentence_result.append({'similarity_ratio': similarity_ratio, 'feedback': feedback})
         sentence_result.append(phonetics_comparison)
-        sentence_result.append({'phonetic_feedback': phonetic_feedback})
 
         result.append(sentence_result)
 
