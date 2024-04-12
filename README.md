@@ -284,11 +284,15 @@ What limitations of using a speech-to-text engine for pronunciation training pur
 
 #### Your answer
 
- - Integer representation, for example: €8.5 , 2023 , 13th<br>
- - Text duplication, for example : I have a, I have<br>
- - Lower case, for example : Interesting<br>
- - Identify similar Sounds, for example : One instead   won<br>
- - Represent date per specific format, for example : 13th of May, 2023<br>
+1. Limitation of Integer Representation: Speech-to-text engines may encounter challenges in accurately transcribing numerical values, such as currency amounts (e.g., €8.5), years (e.g., 2023), or ordinal numbers (e.g., 13th), which require proper interpretation and representation.
+
+2. Text Duplication: Speech-to-text systems may struggle to correctly identify and handle instances of text duplication within a spoken utterance, leading to potential errors or redundancies in the transcription output. For instance, the phrase "I have a, I have" could be misinterpreted.
+
+3. Lowercase Representation: Speech-to-text engines may face difficulties in distinguishing between uppercase and lowercase letters, which can impact the accuracy of transcribed text, especially in cases where capitalization carries semantic significance. For example, transcribing "Interesting" as "interesting" may alter the intended meaning.
+
+4. Identification of Similar Sounds: Speech-to-text systems may have difficulty distinguishing between words that sound similar but have different meanings (homophones), leading to potential errors in transcription. For instance, "won" being transcribed as "one" could result in semantic inaccuracies.
+
+5. Representation of Dates in Specific Formats: Speech-to-text engines may struggle to accurately transcribe dates expressed in specific formats, such as "13th of May, 2023," requiring robust handling of date formats to ensure accurate interpretation and representation in the transcribed text. 
 
 #### Question 2
 
@@ -297,21 +301,9 @@ You had very limited resources for this  implementation. Briefly describe what k
 
 #### Your answer
 I will invest time in few areas : <br>
-<br>
-**Improved speech-to-text engine**
-* Validate different speech recognition models like the [open source version ](https://github.com/openai/whisper)of **Whisper** by OpenAi.
-* Model Retraining - Using Babbel user audio recordings, to retrain in house speech-to-text models.  
 
-**Improve phonemes recognition**
-* Enhance the system's accuracy, evaluate phonemes recognition libraries like : g2p, and phonemizer.
-* use Babbel user audio recordings / phonemes data, to train the phonemes recognition model.
-* Addressing any potential issues (describe in the previous question, for example:Identify similar Sounds,Text duplication, etc...)
-* Support multiple languages
-
-
-**Implement Graphemic Comparison**
-<br><br>
-**Improve feedback**
-* Give a fair and helpful message based on the results of the evaluation step.
-**Visual output** 
-* Option to practice the specific phoneme, identified as difficult for users to practice.
+* **Improved Speech-to-Text Engine**: Conduct thorough validation of various speech recognition models, including  [open source ](https://github.com/openai/whisper) solutions like Whisper by OpenAI. Explore the possibility of model retraining using Babbel user audio recordings to fine-tune in-house speech-to-text models.<br><br>
+* **Enhanced Phoneme Recognition**: Investigate phoneme recognition libraries such as g2p and phonemizer to improve accuracy. Utilize Babbel user audio recordings and phoneme data for training the phoneme recognition model. Address potential issues identified in the previous question, such as similar sounds and text duplication.<br><br>
+* **Support for Multiple Languages**: Expand the system's language support to cater to a diverse user base. This involves integrating language-specific models and datasets for accurate speech recognition and phoneme analysis across various languages.<br><br>
+* **Implement Graphemic Comparison**: Develop a robust graphemic comparison mechanism to analyze differences and similarities in textual representations. This allows for more accurate assessment of pronunciation and feedback provision tailored to specific grapheme-phoneme mappings.<br><br>
+* **Improved Feedback Mechanism**: Enhance the feedback mechanism to provide fair and helpful messages based on evaluation results. Consider implementing visual outputs for easier interpretation of feedback. Additionally, offer users the option to focus on practicing specific phonemes identified as challenging based on their performance.<br><br>
