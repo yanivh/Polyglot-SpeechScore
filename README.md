@@ -300,7 +300,7 @@ You had very limited resources for this  implementation. Briefly describe what k
 
 
 #### Your answer
-I will invest time in few areas : <br>
+I will explore in few areas : <br>
 
 * **Improved Speech-to-Text Engine**: Conduct thorough validation of various speech recognition models, including  [open source ](https://github.com/openai/whisper) solutions like Whisper by OpenAI. Explore the possibility of model retraining using Babbel user audio recordings to fine-tune in-house speech-to-text models.<br><br>
 * **Enhanced Phoneme Recognition**: Investigate phoneme recognition libraries such as g2p and phonemizer to improve accuracy. Utilize Babbel user audio recordings and phoneme data for training the phoneme recognition model. Address potential issues identified in the previous question, such as similar sounds and text duplication.<br><br>
