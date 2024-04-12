@@ -1,9 +1,5 @@
 # Tech Challenge
 
-## **objective**
-
-The primary objective of this exercise is to help you gain a better understanding of the types of problems you would be solving in your daily work, rather than testing the coding skills. Additionally, this challenge allows us to observe your problem-solving approach and thought process within the language learning domain.
-
 
 ## **Coding Challenge description**
 In **learner_input.json**, you are given an example input from one speaking exercise of a Lithuanian learning English. It contains the following information:
