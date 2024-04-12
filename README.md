@@ -284,15 +284,11 @@ What limitations of using a speech-to-text engine for pronunciation training pur
 
 #### Your answer
 
-1. Limitation of Integer Representation: Speech-to-text engines may encounter challenges in accurately transcribing numerical values, such as currency amounts (e.g., €8.5), years (e.g., 2023), or ordinal numbers (e.g., 13th), which require proper interpretation and representation.
-
-2. Text Duplication: Speech-to-text systems may struggle to correctly identify and handle instances of text duplication within a spoken utterance, leading to potential errors or redundancies in the transcription output. For instance, the phrase "I have a, I have" could be misinterpreted.
-
-3. Lowercase Representation: Speech-to-text engines may face difficulties in distinguishing between uppercase and lowercase letters, which can impact the accuracy of transcribed text, especially in cases where capitalization carries semantic significance. For example, transcribing "Interesting" as "interesting" may alter the intended meaning.
-
-4. Identification of Similar Sounds: Speech-to-text systems may have difficulty distinguishing between words that sound similar but have different meanings (homophones), leading to potential errors in transcription. For instance, "won" being transcribed as "one" could result in semantic inaccuracies.
-
-5. Representation of Dates in Specific Formats: Speech-to-text engines may struggle to accurately transcribe dates expressed in specific formats, such as "13th of May, 2023," requiring robust handling of date formats to ensure accurate interpretation and representation in the transcribed text. 
+* Limitation of Integer Representation: Speech-to-text engines may encounter challenges in accurately transcribing numerical values, such as currency amounts (e.g., €8.5), years (e.g., 2023), or ordinal numbers (e.g., 13th), which require proper interpretation and representation.
+* Text Duplication: Speech-to-text systems may struggle to correctly identify and handle instances of text duplication within a spoken utterance, leading to potential errors or redundancies in the transcription output. For instance, the phrase "I have a, I have" could be misinterpreted.
+* Lowercase Representation: Speech-to-text engines may face difficulties in distinguishing between uppercase and lowercase letters, which can impact the accuracy of transcribed text, especially in cases where capitalization carries semantic significance. For example, transcribing "Interesting" as "interesting" may alter the intended meaning.
+* Identification of Similar Sounds: Speech-to-text systems may have difficulty distinguishing between words that sound similar but have different meanings (homophones), leading to potential errors in transcription. For instance, "won" being transcribed as "one" could result in semantic inaccuracies.
+* Representation of Dates in Specific Formats: Speech-to-text engines may struggle to accurately transcribe dates expressed in specific formats, such as "13th of May, 2023," requiring robust handling of date formats to ensure accurate interpretation and representation in the transcribed text. 
 
 #### Question 2
 
