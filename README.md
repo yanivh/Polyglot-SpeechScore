@@ -5,7 +5,7 @@
 The primary objective of this exercise is to help you gain a better understanding of the types of problems you would be solving in your daily work, rather than testing the coding skills. Additionally, this challenge allows us to observe your problem-solving approach and thought process within the language learning domain.
 
 
-## **Coding description**
+## **Coding Challenge description**
 In **learner_input.json**, you are given an example input from one speaking exercise of a Lithuanian learning English. It contains the following information:
 
 **text_to_record**: the phrase that the learner was asked to record.
@@ -36,20 +36,22 @@ Due to the limit of time I decided to focus on **Phonetic Comparison** , even th
 ####     **Code Description - High level**
 
         Reads the learner inputs from a JSON file
-        Gets the threshold from a config file, 
-        Iterates over the learner inputs.
+        Gets the threshold from a config file
+        Iterates over the learner inputs
         For each input
-            Gets the expected text and the learner's transcript, 
-            calculates the similarity ratio and feedback, 
+            Gets the expected text and the learner's transcript
+            calculates the similarity ratio and feedback
             Performs a phonetic comparison
-            Appends the results to a list. 
-        Finally, it writes the results to a JSON file and prints them
+            Appends the results to a list
+        Finally, it writes the results to a JSON file and prints them.
 
 #### Code Description - In details
 
 The provided Python code is part of a larger project that aims to assess the pronunciation of a learner based on the similarity ratio between the expected text and the learner's transcript. The code uses several libraries such as `gruut`, `nltk`, and `difflib` to achieve this.
 
 The function `assess_similarity(expected_text, learner_transcript, threshold=0.7)` is the main function that calculates the similarity ratio between the expected text and the learner's transcript. It uses the `difflib.SequenceMatcher` class to calculate this ratio. If the ratio is greater than or equal to the threshold (default is 0.7), it provides positive feedback, otherwise, it suggests improvement.
+<br><br>
+**difflib.SequenceMatcher** - provides a general indication of how similar the sequences are based on their characters or elements.
 
 ```python
 similarity_ratio = difflib.SequenceMatcher(None, expected_text, learner_transcript).ratio()
@@ -262,7 +264,7 @@ What limitations of using a speech-to-text engine for pronunciation training pur
 
 #### Your answer
 
- - Integer representation, for example: €8.5 , 2023 , 13th<br>
+ - Integer representation, for example : €8.5 , 2023 , 13th<br>
  - Text duplication, for example : I have a, I have<br>
  - Lower case, for example : Interesting<br>
  - Identify similar Sounds, for example : One instead   won<br>
@@ -274,15 +276,16 @@ You had very limited resources for this  implementation. Briefly describe what k
 
 
 #### Your answer
-I will invest time in few areas: <br>
+I will invest time in few areas : <br>
 <br>
 **Improved speech-to-text engine**
 * Validate different speech recognition models like the [open source version ](https://github.com/openai/whisper)of **Whisper** by OpenAi.
 * Model Retraining - Using Babbel user audio recordings, to retrain in house speech-to-text models.  
 
 **Improve phonemes recognition**
-* Enhance the system's accuracy.
-* addressing any potential issues (describe in in the previous question)
+* Enhance the system's accuracy, evaluate phonemes recognition libraries like : g2p, and phonemizer.
+* use Babbel user audio recordings / phonemes data, to train the phonemes recognition model.
+* Addressing any potential issues (describe in the previous question, for example:Identify similar Sounds,Text duplication, etc...)
 * Support multiple languages
 
 
