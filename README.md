@@ -24,84 +24,271 @@ the goal of feedback is to **return** a **fair** and **helpful** message based o
 
 ## **Solution description**
 
-**Enhancing Learner Feedback Through Phonetic and Graphemic comparison**
+**Enhancing Learner Feedback Through Phonetic comparison**
 
-The overarching objective is to assess how closely the learner's recorded speech matches the expected text. To achieve this, I examined two valid approaches within linguistic analysis: phonetic and graphemic representations. Each method offers unique insights depending on the context and criteria of comparison, detailed further in the attached appendix.
+Approaching this task I  found 2 valid options within the domain of linguistic analysis. <br><br>
+**Phonetic** Comparison,  is useful when the focus is on pronunciation or when assessing similarity based on sound rather than spelling.<br><br>
+**Graphemic** Comparison, is useful when the focus is on orthographic similarities or when assessing similarity based on spelling rather than pronunciation	<br><br>
+Due to the limit of time I decided to focus on **Phonetic Comparison** , even though I am aware of the importance of Graphemic Comparison in providing vital data that can improve the overall user Feedback.
 
-By incorporating both phonetic and graphemic representations, we aim to offer comprehensive feedback to learners. A high similarity score between the learner's input and the expected text will warrant positive feedback, while discrepancies may prompt suggestions for improvement. This approach ensures a thorough evaluation and helpful guidance for learners striving to improve their spoken language skills.
 
-## **Solution walk-through**
 
-Create a virtual environment and install the required packages:
-```bash
-python3 -m venv .venv`
-`source .venv/bin/activate` 
+####     **Code Description - High level**
+
+        Reads the learner inputs from a JSON file
+        Gets the threshold from a config file, 
+        Iterates over the learner inputs.
+        For each input
+            Gets the expected text and the learner's transcript, 
+            calculates the similarity ratio and feedback, 
+            Performs a phonetic comparison
+            Appends the results to a list. 
+        Finally, it writes the results to a JSON file and prints them
+
+#### Code Description - In details
+
+The provided Python code is part of a larger project that aims to assess the pronunciation of a learner based on the similarity ratio between the expected text and the learner's transcript. The code uses several libraries such as `gruut`, `nltk`, and `difflib` to achieve this.
+
+The function `assess_similarity(expected_text, learner_transcript, threshold=0.7)` is the main function that calculates the similarity ratio between the expected text and the learner's transcript. It uses the `difflib.SequenceMatcher` class to calculate this ratio. If the ratio is greater than or equal to the threshold (default is 0.7), it provides positive feedback, otherwise, it suggests improvement.
+
+```python
+similarity_ratio = difflib.SequenceMatcher(None, expected_text, learner_transcript).ratio()
+if similarity_ratio >= threshold:
+    feedback = f"Sounds good!"
+else:
+    feedback = f"Needs improvement!"
 ```
 
+The function `grapheme_to_phoneme_gruut(grapheme, lang="en")` uses the `gruut` library to convert graphemes (written language) to phonemes (spoken language). It iterates over the sentences and words, printing the word and its phonemes.
 
-### __**Phonetic**__
+The `word_segmentation(sentence, language='en')` function tokenizes the input sentence into words using the `nltk.word_tokenize` function, and removes punctuation marks.
 
-####     **Phonetic representation**
+The `phoneme_feedback(mismatch, matches)` function provides feedback based on the phoneme comparison output. If there are no mismatches, it provides positive feedback, otherwise, it suggests improvement.
 
-        Per each sentence 
-            Words tokenize , using nltk library. 
-            Normalize  
-                Removing extra symbols,  
-                Remove not alphabetic characters.
-                Convert to lowercase.
-                Remove duplicates.
-            Return list of words.
-        Per each word
-        segment the word into graphemes
-		    Use grapheme_list to group char’s, ex.['ee','ll']
-		    Return list of graphemes.
+The `phoneme_difference(elem1, elem2, threshold=0.7)` function calculates the difference between two phonemes. It uses the `phoneme_comparison` function to get the difference and matches between the phonemes of the expected text and the learner's transcript.
 
-####     **Graphemic comparison**
+The `calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=0.7)` function calculates the difference between the expected text phonemes and the learner transcript phonemes. It uses the `phoneme_difference` function to get the output for each pair of phonemes.
 
-	    Per each graphemes
-        Convert the words to lowercase for case-insensitive comparison
-	    Check if the words are identical
-		Iterate over each character in the words and count differences
-        crate similarity score based on the number of differences.
+The `phonetic_comparison(expected_text_words, learner_transcript_words, threshold=0.7)` function performs a phonetic comparison based on the phonetic transcription of the words. It uses the `word_segmentation` function to segment the sentences into words, the `grapheme_to_phoneme_gruut` function to convert the words to phonemes, and the `calculate` function to get the comparison result.
 
-### __**Graphemic**__
+In the `if __name__ == "__main__"` block, the code reads the learner inputs from a JSON file, gets the threshold from a config file, and iterates over the learner inputs. For each input, it gets the expected text and the learner's transcript, calculates the similarity ratio and feedback, performs a phonetic comparison, and appends the results to a list. Finally, it writes the results to a JSON file and prints them.
 
-####     **Graphemic representation**
+#### learner_output 
 
-        Per each sentence 
-            Words tokenize , using nltk library. 
-            normalize - 
-                Removing extra symbols,  
-                Remove not alphabetic characters.
-                Convert to lowercase.
-                Remove duplicates.
-            Return list of words.
-        Per each word
-        segment the word into graphemes
-		    Use grapheme_list to group char’s, ex.['ee','ll']
-		    Return list of graphemes.
+```json
+[
+    [
+        {
+            "expected_text": "I have two and a half euros.",
+            "learner_transcript": "I have a, I have \u20ac8.5."
+        },
+        {
+            "similarity_ratio": 0.52,
+            "feedback": "Needs improvement!"
+        },
+        [
+            [
+                {
+                    "word": "i",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "have",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "two",
+                    "match_score": "-2",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "and",
+                    "match_score": "-3",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "a",
+                    "match_score": "-1",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "half",
+                    "match_score": "-3",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "euros",
+                    "match_score": "-6",
+                    "feedback": "Needs improvement!"
+                }
+            ]
+        ]
+    ],
+    [
+        {
+            "expected_text": "interesting",
+            "learner_transcript": "Interesting."
+        },
+        {
+            "similarity_ratio": 0.8695652173913043,
+            "feedback": "Sounds good!"
+        },
+        [
+            [
+                {
+                    "word": "interesting",
+                    "match_score": 0.7777777777777778,
+                    "feedback": "Sounds good!"
+                }
+            ]
+        ]
+    ],
+    [
+        {
+            "expected_text": "won",
+            "learner_transcript": "One."
+        },
+        {
+            "similarity_ratio": 0.2857142857142857,
+            "feedback": "Needs improvement!"
+        },
+        [
+            [
+                {
+                    "word": "won",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ]
+        ]
+    ],
+    [
+        {
+            "expected_text": "Today is the thirteenth of May, twenty twenty three.",
+            "learner_transcript": "Today is the 13th of May, 2023."
+        },
+        {
+            "similarity_ratio": 0.6024096385542169,
+            "feedback": "Needs improvement!"
+        },
+        [
+            [
+                {
+                    "word": "today",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "is",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "the",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "thirteenth",
+                    "match_score": 0.8333333333333334,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "of",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "may",
+                    "match_score": 1,
+                    "feedback": "Sounds good!"
+                }
+            ],
+            [
+                {
+                    "word": "twenty",
+                    "match_score": "-5",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "twenty",
+                    "match_score": "-5",
+                    "feedback": "Needs improvement!"
+                }
+            ],
+            [
+                {
+                    "word": "three",
+                    "match_score": "-3",
+                    "feedback": "Needs improvement!"
+                }
+            ]
+        ]
+    ]
+]
+                    
+```
 
-####     **Graphemic comparison**
-
-	    Per each graphemes
-        Convert the words to lowercase for case-insensitive comparison
-	    Check if the words are identical
-		Iterate over each character in the words and count differences
-        crate similarity score based on the number of differences.
-
-
-
-
-
-#### Questions
+#### Questions : 
 
 #### Question 1
 What limitations of using a speech-to-text engine for pronunciation training purposes have you observed?
 
 #### Your answer
 
-Write your answer here.
+ - Integer representation, for example: €8.5 , 2023 , 13th<br>
+ - Text duplication, for example : I have a, I have<br>
+ - Lower case, for example : Interesting<br>
+ - Identify similar Sounds, for example : One instead   won<br>
+ - Represent date per specific format, for example : 13th of May, 2023<br>
 
 #### Question 2
 
 You had very limited resources for this  implementation. Briefly describe what kind of approach you might have chosen if time and resources would not have been a problem.
+
+
+#### Your answer
+I will invest time in few areas: <br>
+<br>
+**Improved speech-to-text engine**
+* Validate different speech recognition models like the [open source version ](https://github.com/openai/whisper)of **Whisper** by OpenAi.
+* Model Retraining - Using Babbel user audio recordings, to retrain in house speech-to-text models.  
+
+**Improve phonemes recognition**
+* Enhance the system's accuracy.
+* addressing any potential issues (describe in in the previous question)
+* Support multiple languages
+
+
+**Implement Graphemic Comparison**
+<br><br>
+**Improve feedback**
+* Give a fair and helpful message based on the results of the evaluation step.
+**Visual output** 
+* Option to practice the specific phoneme, identified as difficult for users to practice.
