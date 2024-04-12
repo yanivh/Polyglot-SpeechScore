@@ -1,5 +1,6 @@
 # Tech Challenge
 
+[Repository](https://github.com/yanivh/Polyglot-SpeechScore/tree/main) for the Tech Challenge
 
 ## **Coding Challenge description**
 In **learner_input.json**, you are given an example input from one speaking exercise of a Lithuanian learning English. It contains the following information:
