@@ -40,6 +40,7 @@ Due to the limit of time I decided to focus on **Phonetic Comparison** , even th
             calculates the similarity ratio and feedback
             Performs a phonetic comparison
             Appends the results to a list
+            Print informative message
         Finally, it writes the results to a JSON file and prints them.
 
 #### Code Description - In details
