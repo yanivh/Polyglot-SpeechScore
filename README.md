@@ -73,6 +73,17 @@ The `calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=0.
 
 The `phonetic_comparison(expected_text_words, learner_transcript_words, threshold=0.7)` function performs a phonetic comparison based on the phonetic transcription of the words. It uses the `word_segmentation` function to segment the sentences into words, the `grapheme_to_phoneme_gruut` function to convert the words to phonemes, and the `calculate` function to get the comparison result.
 
+The  `create_message` function generates a helpful message based on the results of the evaluation step. It calculates the total match score and identifies the words that need practice and the words that were successful. It then generates a message based on these results.
+
+
+```python
+if len(words_to_practice) > 0:
+    message.append(f"Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation "
+                   f"of words: \n {f' , '.join(words_to_practice)} \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!")
+else:
+    message.append(f"Great job! You're doing well with all of the words in the phrase.")
+```
+
 In the `if __name__ == "__main__"` block, the code reads the learner inputs from a JSON file, gets the threshold from a config file, and iterates over the learner inputs. For each input, it gets the expected text and the learner's transcript, calculates the similarity ratio and feedback, performs a phonetic comparison, and appends the results to a list. Finally, it writes the results to a JSON file and prints them.
 
 #### learner_output 
@@ -138,6 +149,9 @@ In the `if __name__ == "__main__"` block, the code reads the learner inputs from
                     "feedback": "Needs improvement!"
                 }
             ]
+        ],
+        [
+            "Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation of words: \n two , and , a , half , euros \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!"
         ]
     ],
     [
@@ -157,6 +171,9 @@ In the `if __name__ == "__main__"` block, the code reads the learner inputs from
                     "feedback": "Sounds good!"
                 }
             ]
+        ],
+        [
+            "Great job! You're doing well with all of the words in the phrase."
         ]
     ],
     [
@@ -176,6 +193,9 @@ In the `if __name__ == "__main__"` block, the code reads the learner inputs from
                     "feedback": "Sounds good!"
                 }
             ]
+        ],
+        [
+            "Great job! You're doing well with all of the words in the phrase."
         ]
     ],
     [
@@ -251,6 +271,9 @@ In the `if __name__ == "__main__"` block, the code reads the learner inputs from
                     "feedback": "Needs improvement!"
                 }
             ]
+        ],
+        [
+            "Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation of words: \n twenty , twenty , three \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!"
         ]
     ]
 ]
@@ -264,7 +287,7 @@ What limitations of using a speech-to-text engine for pronunciation training pur
 
 #### Your answer
 
- - Integer representation, for example : €8.5 , 2023 , 13th<br>
+ - Integer representation, for example: €8.5 , 2023 , 13th<br>
  - Text duplication, for example : I have a, I have<br>
  - Lower case, for example : Interesting<br>
  - Identify similar Sounds, for example : One instead   won<br>

@@ -184,6 +184,32 @@ def phonetic_comparison(expected_text_words, learner_transcript_words, threshold
     return comparison
 
 
+def create_message(sentence_result):
+    '''
+    return a fair and helpful message based on the results of the evaluation step.
+    :return:
+    '''
+
+    message = []
+
+    total_match_score = 0
+    words_to_practice = []
+    words_successful = []
+    for word_result in sentence_result[2]:
+        if int(word_result[0]['match_score']) < 0 or word_result[0] is None:
+            words_to_practice.append(word_result[0]['word'])
+        else:
+            words_successful.append(word_result[0]['word'])
+
+    if len(words_to_practice) > 0:
+        message.append(f"Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation "
+                       f"of words: \n {f' , '.join(words_to_practice)} \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!")
+    else:
+        message.append(f"Great job! You're doing well with all of the words in the phrase.")
+
+    return message
+
+
 if __name__ == "__main__":
 
     nltk.download('punkt')
@@ -217,7 +243,13 @@ if __name__ == "__main__":
         sentence_result.append({'similarity_ratio': similarity_ratio, 'feedback': feedback})
         sentence_result.append(phonetics_comparison)
 
+        helpful_message = create_message(sentence_result)
+
+        sentence_result.append(helpful_message)
         result.append(sentence_result)
 
+        print(helpful_message)
+
+    # Save the result to a JSON file
     write_json_file(result, "speech_score/data/metadata/learner_output.json")
     print(result)
