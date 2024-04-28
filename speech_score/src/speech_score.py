@@ -83,7 +83,7 @@ def phoneme_difference(elem1, elem2, threshold=0.7):
     return output
 
 
-def calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=0.7):
+def get_phonemes_alignment(expected_text_phonemes, learner_transcript_phonemes, threshold=0.7):
     '''
     Calculate the difference between the expected text phonemes and the learner transcript phonemes
     :param expected_text_phonemes:
@@ -117,8 +117,10 @@ def phoneme_comparison(text_to_record_phonetic, text_learner_recording_phonetic)
 
     return difference, matches
 
+# phoneme_to_phoneme_alignment
 
-def phonetic_comparison(expected_text_words, learner_transcript_words, threshold=0.7):
+
+def get_word_phoneme_feedback(expected_text_words, learner_transcript_words, threshold=0.7):
     '''
     phanetic comparison based on the phonetic transcription of the words
     :param expected_text_words:
@@ -127,7 +129,7 @@ def phonetic_comparison(expected_text_words, learner_transcript_words, threshold
     '''
 
     feedback = ""
-    comparison = []
+    phonemes_alignment = []
 
     expected_text_words = word_segmentation(sentence=expected_text, language='english')
     learner_transcript_words = word_segmentation(sentence=learner_transcript, language='english')
@@ -140,9 +142,9 @@ def phonetic_comparison(expected_text_words, learner_transcript_words, threshold
     for word in learner_transcript_words:
         learner_transcript_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme(word)})
 
-    comparison = calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=threshold)
+    phonemes_alignment = get_phonemes_alignment(expected_text_phonemes, learner_transcript_phonemes, threshold=threshold)
 
-    return comparison
+    return phonemes_alignment
 
 
 def create_message(sentence_result):
@@ -190,22 +192,22 @@ if __name__ == "__main__":
         expected_text = ""
         learner_transcript = ""
         similarity_ratio = 0
-        feedback = ""
+        item_feedback = ""
         assess_pronunciation_result = {}
 
         expected_text = learner_input['text_to_record']
         learner_transcript = learner_input['sr_transcript_of_learner_recording']
 
         #  Give some general feedback on the overall sentence
-        similarity_ratio, feedback = assess_similarity(expected_text, learner_transcript, threshold=threshold)
+        similarity_ratio, item_feedback = assess_similarity(expected_text, learner_transcript, threshold=threshold)
 
         #  Give feedback on each word in the sentence
-        phonetics_comparison = phonetic_comparison(expected_text, learner_transcript, threshold=threshold)
+        word_phoneme_feedback = get_word_phoneme_feedback(expected_text, learner_transcript, threshold=threshold)
 
         # Add all analysis results to the result list
         sentence_result.append({'expected_text': expected_text, 'learner_transcript': learner_transcript})
-        sentence_result.append({'similarity_ratio': similarity_ratio, 'feedback': feedback})
-        sentence_result.append(phonetics_comparison)
+        sentence_result.append({'similarity_ratio': similarity_ratio, 'feedback': item_feedback})
+        sentence_result.append(word_phoneme_feedback)
 
         helpful_message = create_message(sentence_result)
 
