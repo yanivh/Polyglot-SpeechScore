@@ -45,42 +45,24 @@ Due to the limit of time I decided to focus on **Phonetic Comparison** , even th
 
 #### Code Description - In details
 
-The provided Python code is part of a larger project that aims to assess the pronunciation of a learner based on the similarity ratio between the expected text and the learner's transcript. The code uses several libraries such as `gruut`, `nltk`, and `difflib` to achieve this.
+The provided Python code is part of a speech scoring system that evaluates a learner's pronunciation based on the similarity ratio between the expected text and the learner's transcript. It also provides feedback on the learner's pronunciation.
 
-The function `assess_similarity(expected_text, learner_transcript, threshold=0.7)` is the main function that calculates the similarity ratio between the expected text and the learner's transcript. It uses the `difflib.SequenceMatcher` class to calculate this ratio. If the ratio is greater than or equal to the threshold (default is 0.7), it provides positive feedback, otherwise, it suggests improvement.
-<br><br>
-**difflib.SequenceMatcher** - provides a general indication of how similar the sequences are based on their characters or elements.
+The provided Python code is part of a speech scoring system that evaluates a learner's pronunciation based on the similarity ratio between the expected text and the learner's transcript. It also provides feedback on the learner's pronunciation.
+
+The function `assess_similarity` calculates the similarity ratio between the expected text and the learner's transcript using the `difflib.SequenceMatcher` class. It then provides feedback based on the similarity ratio. If the ratio is greater than or equal to a defined threshold, the feedback is "Sounds good!", otherwise, it's "Needs improvement!".
 
 ```python
 similarity_ratio = difflib.SequenceMatcher(None, expected_text, learner_transcript).ratio()
-if similarity_ratio >= threshold:
-    feedback = f"Sounds good!"
-else:
-    feedback = f"Needs improvement!"
 ```
 
-The function `grapheme_to_phoneme_gruut(grapheme, lang="en")` uses the `gruut` library to convert graphemes (written language) to phonemes (spoken language). It iterates over the sentences and words, printing the word and its phonemes.
+The function `phoneme_feedback` provides feedback based on the phoneme comparison output. If all values are equal to 1, the feedback is "Sounds good!", otherwise, it's "Needs improvement!".
 
-The `word_segmentation(sentence, language='en')` function tokenizes the input sentence into words using the `nltk.word_tokenize` function, and removes punctuation marks.
+The function `assess_similarity` calculates the similarity ratio between the expected text and the learner's transcript using the `difflib.SequenceMatcher` class. It then provides feedback based on the similarity ratio. If the ratio is greater than or equal to a defined threshold, the feedback is "Sounds good!", otherwise, it's "Needs improvement!".
 
-The `phoneme_feedback(mismatch, matches)` function provides feedback based on the phoneme comparison output. If there are no mismatches, it provides positive feedback, otherwise, it suggests improvement.
+The function `phoneme_difference` calculates the difference between two phonemes and provides feedback based on the difference.
 
-The `phoneme_difference(elem1, elem2, threshold=0.7)` function calculates the difference between two phonemes. It uses the `phoneme_comparison` function to get the difference and matches between the phonemes of the expected text and the learner's transcript.
+The function `get_phonemes_alignment` calculates the difference between the expected text phonemes and the learner transcript phonemes.
 
-The `calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=0.7)` function calculates the difference between the expected text phonemes and the learner transcript phonemes. It uses the `phoneme_difference` function to get the output for each pair of phonemes.
-
-The `phonetic_comparison(expected_text_words, learner_transcript_words, threshold=0.7)` function performs a phonetic comparison based on the phonetic transcription of the words. It uses the `word_segmentation` function to segment the sentences into words, the `grapheme_to_phoneme_gruut` function to convert the words to phonemes, and the `calculate` function to get the comparison result.
-
-The  `create_message` function generates a helpful message based on the results of the evaluation step. It calculates the total match score and identifies the words that need practice and the words that were successful. It then generates a message based on these results.
-
-
-```python
-if len(words_to_practice) > 0:
-    message.append(f"Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation "
-                   f"of words: \n {f' , '.join(words_to_practice)} \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!")
-else:
-    message.append(f"Great job! You're doing well with all of the words in the phrase.")
-```
 
 In the `if __name__ == "__main__"` block, the code reads the learner inputs from a JSON file, gets the threshold from a config file, and iterates over the learner inputs. For each input, it gets the expected text and the learner's transcript, calculates the similarity ratio and feedback, performs a phonetic comparison, and appends the results to a list. Finally, it writes the results to a JSON file and prints them.
 

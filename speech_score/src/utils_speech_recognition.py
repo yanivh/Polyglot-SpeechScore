@@ -10,14 +10,19 @@ def grapheme_to_phoneme(grapheme, lang="en", library="gruut"):
     :param lang:
     :return:
     '''
-    for sent in sentences(grapheme, lang=lang, espeak=True):
-        for word in sent:
-            if word.phonemes:
-                print(word.text, *word.phonemes)
+
+    if library == "gruut":
+        for sent in sentences(grapheme, lang=lang, espeak=True):
+            for word in sent:
+                if word.phonemes:
+                    print(word.text, *word.phonemes)
+    else:
+        print("Library not supported")
+
     return word.phonemes
 
-
-def word_segmentation(sentence, language='en', library='nltk'):
+# word_segmentation
+def sentence_word_tokenize(sentence, language='en', library='nltk'):
     '''
         Description:
         Convert to lowercase

@@ -1,7 +1,7 @@
 import nltk
 from utils import read_json_file, write_json_file, get_threshold, read_json_file
 from utils_audio import play_audio, create_audio_from_phonemes, transcribe_audio, diarization_audio_pyannote
-from utils_speech_recognition import word_segmentation, grapheme_to_phoneme
+from utils_speech_recognition import sentence_word_tokenize, grapheme_to_phoneme
 from itertools import zip_longest
 import difflib
 import pyannote
@@ -131,8 +131,8 @@ def get_word_phoneme_feedback(expected_text_words, learner_transcript_words, thr
     feedback = ""
     phonemes_alignment = []
 
-    expected_text_words = word_segmentation(sentence=expected_text, language='english')
-    learner_transcript_words = word_segmentation(sentence=learner_transcript, language='english')
+    expected_text_words = sentence_word_tokenize(sentence=expected_text, language='english')
+    learner_transcript_words = sentence_word_tokenize(sentence=learner_transcript, language='english')
 
     expected_text_phonemes = []
     for word in expected_text_words:
