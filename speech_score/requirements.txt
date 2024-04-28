@@ -2,3 +2,13 @@ nltk
 numpy
 gruut
 numpy
+pydub
+gtts
+gradio==3.22.1
+openai-whisper
+pyannote-audio
+torch
+waveglow
+langchain
+langchain_community
+openai

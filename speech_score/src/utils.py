@@ -1,4 +1,5 @@
 import json
+import os
 
 
 def get_threshold(config_file_path):
@@ -37,3 +38,24 @@ def write_json_file(data, file_path="learner_output.json"):
     # Save the dictionary as a JSON file
     with open(file_path, "w") as json_file:
         json.dump(data, json_file)
+
+
+def get_config(config_file_path):
+    """
+    Get the threshold value from the configuration file.
+    :return: threshold value
+    """
+    # Load the configuration file
+    config = read_json_file(config_file_path)
+
+    return config
+
+def get_config_key(key_name="huggingfaceTOKEN"):
+    '''
+
+    :param key_name:
+    :return:
+    '''
+
+    config = get_config("speech_score/data/config/config.json")
+    return config[0][key_name]

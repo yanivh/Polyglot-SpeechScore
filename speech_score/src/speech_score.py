@@ -1,8 +1,10 @@
-from gruut import sentences
 import nltk
-from utils import read_json_file, write_json_file , get_threshold
+from utils import read_json_file, write_json_file, get_threshold, read_json_file
+from utils_audio import play_audio, create_audio_from_phonemes, transcribe_audio, diarization_audio_pyannote
+from utils_speech_recognition import word_segmentation, grapheme_to_phoneme
 from itertools import zip_longest
 import difflib
+import pyannote
 
 
 def assess_similarity(expected_text, learner_transcript, threshold=0.7):
@@ -25,54 +27,12 @@ def assess_similarity(expected_text, learner_transcript, threshold=0.7):
     return similarity_ratio, feedback
 
 
-def grapheme_to_phoneme_gruut(grapheme, lang="en"):
-    '''
-    using gruut python library to convert grapheme to phoneme
-    :param grapheme:
-    :param lang:
-    :return:
-    '''
-    for sent in sentences(grapheme, lang=lang, espeak=True):
-        for word in sent:
-            if word.phonemes:
-                print(word.text, *word.phonemes)
-    return word.phonemes
-
-
-def word_segmentation(sentence, language='en'):
-    '''
-        Description:
-        Convert to lowercase
-        tokanize
-        Removing extra symbols,
-        todo: Remove not alphabetic characters.
-        todo : Remove duplicates text.
-        :param
-            sentence:
-            language: default 'en'
-        :return:
-        '''
-
-    punctuation_marks = '.,?!;:()[]{}"\'-'
-
-    sentence = sentence.lower()
-
-    # Identify the language of the sentence
-    words = nltk.word_tokenize(sentence, language=language)
-
-    #  remove punctuation_marks
-    words = [word for word in words if word not in punctuation_marks]
-
-    return words
-
-
 def phoneme_feedback(mismatch, matches):
     '''
     Provide feedback based on the phoneme comparison output
     :param output:
     :return:
     '''
-
 
     # Check if all values are equal to 1
     if len(mismatch) == 0:
@@ -101,7 +61,6 @@ def phoneme_difference(elem1, elem2, threshold=0.7):
             expected_text_phonemes_ = elem1
             learner_transcript__phonemes_ = {'word': [], 'phonemes': []}
 
-
         difference, matches = phoneme_comparison(expected_text_phonemes_['phonemes'],
                                                  learner_transcript__phonemes_['phonemes'])
 
@@ -110,11 +69,13 @@ def phoneme_difference(elem1, elem2, threshold=0.7):
         if len(matches) == 0 and len(difference) == 0:
             output.append({'word': '', 'match_score': 0, 'feedback': feedback})
         elif difference:
-            output.append({'word': expected_text_phonemes_['word'], 'match_score': f'-{len(difference)}', 'feedback': feedback})
+            output.append(
+                {'word': expected_text_phonemes_['word'], 'match_score': f'-{len(difference)}', 'feedback': feedback})
 
         else:
             output.append({'word': expected_text_phonemes_['word'],
-                           'match_score': len(matches) / len(expected_text_phonemes_['phonemes']), 'feedback': feedback})
+                           'match_score': len(matches) / len(expected_text_phonemes_['phonemes']),
+                           'feedback': feedback})
 
     except Exception as e:
         print(f"Error: {e}")
@@ -173,11 +134,11 @@ def phonetic_comparison(expected_text_words, learner_transcript_words, threshold
 
     expected_text_phonemes = []
     for word in expected_text_words:
-        expected_text_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme_gruut(word)})
+        expected_text_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme(word)})
 
     learner_transcript_phonemes = []
     for word in learner_transcript_words:
-        learner_transcript_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme_gruut(word)})
+        learner_transcript_phonemes.append({'word': word, 'phonemes': grapheme_to_phoneme(word)})
 
     comparison = calculate(expected_text_phonemes, learner_transcript_phonemes, threshold=threshold)
 
@@ -202,8 +163,9 @@ def create_message(sentence_result):
             words_successful.append(word_result[0]['word'])
 
     if len(words_to_practice) > 0:
-        message.append(f"Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation "
-                       f"of words: \n {f' , '.join(words_to_practice)} \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!")
+        message.append(
+            f"Great effort! You're doing well with most of the words in the phrase. Let's focus on improving the pronunciation "
+            f"of words: \n {f' , '.join(words_to_practice)} \n to bring your accuracy even higher. Keep practicing, and youll master it in no time!")
     else:
         message.append(f"Great job! You're doing well with all of the words in the phrase.")
 
@@ -212,7 +174,9 @@ def create_message(sentence_result):
 
 if __name__ == "__main__":
 
+    # model trained to work well for multiple languages
     nltk.download('punkt')
+
     learner_inputs = read_json_file("speech_score/data/metadata/learner_input.json")
 
     threshold = get_threshold("speech_score/data/config/config.json")
@@ -253,3 +217,12 @@ if __name__ == "__main__":
     # Save the result to a JSON file
     write_json_file(result, "speech_score/data/metadata/learner_output.json")
     print(result)
+
+    # continue to ɛkˈspɛrɪm(ə)nt/ with Audio-to-text
+
+    # file_name = "youtube.wav"  # Replace with the path to your audio file
+    file_name = "euros.wav"
+    play_audio("speech_score/data/audios", file_name)
+    diarization = diarization_audio_pyannote(file_name)
+    transcribe = transcribe_audio(file_name, model_size="small.en")
+    print (transcribe)
