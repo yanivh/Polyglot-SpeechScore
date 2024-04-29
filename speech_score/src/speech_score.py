@@ -6,6 +6,8 @@ from itertools import zip_longest
 import difflib
 import pyannote
 
+# model trained to work well for multiple languages
+nltk.download('punkt')
 
 def assess_similarity(expected_text, learner_transcript, threshold=0.7):
     """
@@ -176,8 +178,8 @@ def create_message(sentence_result):
 
 if __name__ == "__main__":
 
-    # model trained to work well for multiple languages
-    nltk.download('punkt')
+    # file_name = "says-thank-you.wav"
+    # play_audio("speech_score/data/audios_phonemes", file_name)
 
     learner_inputs = read_json_file("speech_score/data/metadata/learner_input.json")
 
@@ -223,8 +225,8 @@ if __name__ == "__main__":
     # continue to ɛkˈspɛrɪm(ə)nt/ with Audio-to-text
 
     # file_name = "youtube.wav"  # Replace with the path to your audio file
-    file_name = "euros.wav"
-    play_audio("speech_score/data/audios", file_name)
+    file_name = "euro_word.wav"
+    play_audio("speech_score/data/audios_phoneme", file_name)
     diarization = diarization_audio_pyannote(file_name)
     transcribe = transcribe_audio(file_name, model_size="small.en")
     print (transcribe)
